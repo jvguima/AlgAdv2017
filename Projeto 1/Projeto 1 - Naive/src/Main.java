@@ -120,7 +120,7 @@ public class Main {
     static boolean buscaTradicional(int tabuleiro[][], int nRecursao,
             ArrayList<Movimentos> ListaMovimento, Pos pos0, Movimentos ultMov){
         
-        System.out.println("Rec:" + nRecursao);
+        //System.out.println("Rec:" + nRecursao);
         
         /* So you will not be allowed to use more than 50 steps to solve a puzzle. If the given initial
         configuration is not solvable you just need to print the line ‘This puzzle is not solvable.’*/
@@ -143,13 +143,13 @@ public class Main {
 
                     mover(tabuleiro, pos0, i);
                    
-                    System.out.println("DEPOIS MOV " + i + " REC " + nRecursao);
+                    /*System.out.println("DEPOIS MOV " + i + " REC " + nRecursao);
                     for (int j =0; j<4; j++){
                         for(int k = 0; k<4; k++){
                             System.out.print(tabuleiro[j][k]+" ");
                         }
                         System.out.print("\n");
-                    }
+                    }*/
                     
                     
                     if(buscaTradicional(tabuleiro, nRecursao+1, ListaMovimento, pos0, i)){
@@ -202,15 +202,6 @@ public class Main {
             //ArrayList moveValidos = geraMovimentosValidos(tabuleiro, pos0);
             //moveValidos.forEach((t) -> {System.out.println(t);});
             
-            System.out.println("ANTES");
-            
-            for (int j =0; j<4; j++){
-                for(int k = 0; k<4; k++){
-                    System.out.print(tabuleiro[j][k]+" ");
-                }
-                System.out.print("\n");
-            }
-            
             //TESTE DE MOVE
             /*mover(tabuleiro, pos0, Movimentos.L);
             System.out.println("DEPOIS");
@@ -227,12 +218,19 @@ public class Main {
             }System.out.println("\n");
             
             */
-            if(buscaTradicional(tabuleiro, 0, listaMovimento, pos0, null)){
-                listaMovimento.forEach((t) -> {System.out.println(t);});
-                System.out.println("Tempo de processamento");
+           
+            long startTime = System.currentTimeMillis();
+            boolean success = buscaTradicional(tabuleiro, 0, listaMovimento, pos0, null);
+            long endTime = System.currentTimeMillis();
+            long totalTime = endTime - startTime;
+            if(success){
+                for(int k=listaMovimento.size()-1; k>=0; k--){
+                    System.out.println(listaMovimento.get(k));
+                }
             }
             else
-                System.out.println( "‘This puzzle is not solvable.’ Tempo de processamento");
+                System.out.println( "‘This puzzle is not solvable.’");
+            System.out.println("Tempo de processamento: " + totalTime + " ms");
 	}
     }
     
