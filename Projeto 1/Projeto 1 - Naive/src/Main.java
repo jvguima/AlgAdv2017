@@ -25,30 +25,48 @@ public class Main {
         }
     }
     
-    
-    static enum Movimentos {L, R, U, D}
+    static enum Movimentos {R, D, L, U}
     
     static boolean emOrdem(int tabuleiro[][]){
         
 	for(int i=0;i<15;i++)
-		if(tabuleiro[i/4][i%4] != i)
+		if(tabuleiro[i/4][i%4] != i+1)
 			return false;
 	return true;
     }
+    
+    /**
+     * Método que gera movimentos válidos considerando a posição do espaço vazio e o ultimo movimento válido.
+     * O Movimentos válidos não devem violar os limites do tabuleiro e não devem desfazer o movimento anterior
+     * @param tabuleiro
+     * @param ultMov Ultimo movimento realizado
+     * @param pos0
+     * @return 
+     */
+    static ArrayList<Movimentos> geraMovimentosValidos(int tabuleiro[][], Movimentos ultMov, Pos pos0){
+        
+        ArrayList movimentosValidos = new ArrayList<>();
 
-    static ArrayList<Movimentos> geraMovimentosValidos(int tabuleiro[][], Pos pos0){
-	//Verifica se tem espaço acima, abaixo e nos lados.
-        ArrayList movimentos = new ArrayList<>();
-	if(0<pos0.col)//left
-		movimentos.add(Movimentos.L);
-	if(pos0.col<3)//right
-		movimentos.add(Movimentos.R);
-	if(0<pos0.lin)//up
-		movimentos.add(Movimentos.U);
-	if(pos0.lin<3)//down
-		movimentos.add(Movimentos.D);
-		
-	return movimentos;
+        if(ultMov != null){
+            if(pos0.col<3 && ultMov!=Movimentos.L)//right
+                    movimentosValidos.add(Movimentos.R);        
+            if(pos0.lin<3 && ultMov!=Movimentos.U)//down
+                    movimentosValidos.add(Movimentos.D);            
+            if(0<pos0.col && ultMov!=Movimentos.R)//left
+                    movimentosValidos.add(Movimentos.L);
+            if(0<pos0.lin && ultMov!=Movimentos.D)//up
+                    movimentosValidos.add(Movimentos.U);
+        }else{
+            if(pos0.col<3)//right
+                    movimentosValidos.add(Movimentos.R);
+            if(pos0.lin<3)//down
+                    movimentosValidos.add(Movimentos.D);            
+            if(0<pos0.col)//left
+                movimentosValidos.add(Movimentos.L);
+            if(0<pos0.lin)//up
+                    movimentosValidos.add(Movimentos.U);
+        }
+	return movimentosValidos;
     }
     
     /***
@@ -90,29 +108,53 @@ public class Main {
         pos0.setPos(newLine, newCol);//Atualiza a posição do zero       
     }
    
-    static boolean buscaTradicional(int tabuleiro[][], int nRecursao, ArrayList<Movimentos> ListaMovimento, Pos pos0){
+    /**
+     * Busca tradicional, backtracking cego, bruteforce.
+     * @param tabuleiro
+     * @param nRecursao
+     * @param ListaMovimento
+     * @param pos0
+     * @param UltMov Ultimo movimento realizado. Null se é o primeiro movimento
+     * @return 
+     */
+    static boolean buscaTradicional(int tabuleiro[][], int nRecursao,
+            ArrayList<Movimentos> ListaMovimento, Pos pos0, Movimentos ultMov){
         
         System.out.println("Rec:" + nRecursao);
         
         /* So you will not be allowed to use more than 50 steps to solve a puzzle. If the given initial
         configuration is not solvable you just need to print the line ‘This puzzle is not solvable.’*/
-        if(nRecursao >= 50) //
-                return false;
+        if(nRecursao >= 50)
+            return false;
         else if (emOrdem(tabuleiro))//Tabuleiro em ordem
-                return true;
+            return true;
         //Se não está ordenado, move o espaço vazio para a próxima posição válida
         else{
-            
             //Gera lista de movimentos válidos baseado na posição do zero
-            ArrayList<Movimentos> movimentosValidos = geraMovimentosValidos(tabuleiro, pos0);
+            ArrayList<Movimentos> movimentosValidos;
+            movimentosValidos = geraMovimentosValidos(tabuleiro, ultMov, pos0);
             
+            /*System.out.println("Movimentos Validos em " + nRecursao);
+            for (Movimentos i : movimentosValidos){
+                System.out.print(i+" ");
+            }System.out.println("\n");*/
+                        
             for (Movimentos i : movimentosValidos){
 
                     mover(tabuleiro, pos0, i);
-
-                    if(buscaTradicional(tabuleiro, nRecursao+1, ListaMovimento, pos0)){
-                            ListaMovimento.add(i);
-                            return true;
+                   
+                    System.out.println("DEPOIS MOV " + i + " REC " + nRecursao);
+                    for (int j =0; j<4; j++){
+                        for(int k = 0; k<4; k++){
+                            System.out.print(tabuleiro[j][k]+" ");
+                        }
+                        System.out.print("\n");
+                    }
+                    
+                    
+                    if(buscaTradicional(tabuleiro, nRecursao+1, ListaMovimento, pos0, i)){
+                        ListaMovimento.add(i);
+                        return true;
                     }
                     //Não deu certo, desfaz o movimento
                     switch(i){
@@ -160,7 +202,7 @@ public class Main {
             //ArrayList moveValidos = geraMovimentosValidos(tabuleiro, pos0);
             //moveValidos.forEach((t) -> {System.out.println(t);});
             
-            /*System.out.println("ANTES");
+            System.out.println("ANTES");
             
             for (int j =0; j<4; j++){
                 for(int k = 0; k<4; k++){
@@ -169,7 +211,8 @@ public class Main {
                 System.out.print("\n");
             }
             
-            mover(tabuleiro, pos0, Movimentos.D);
+            //TESTE DE MOVE
+            /*mover(tabuleiro, pos0, Movimentos.L);
             System.out.println("DEPOIS");
             for (int j =0; j<4; j++){
                 for(int k = 0; k<4; k++){
@@ -177,8 +220,14 @@ public class Main {
                 }
                 System.out.print("\n");
             }*/
+           /* 
+            ArrayList<Movimentos> movimentosValidos = geraMovimentosValidos(tabuleiro,Movimentos.L,pos0);
+            for (Movimentos K : movimentosValidos){
+                System.out.print(K+" ");
+            }System.out.println("\n");
             
-            if(buscaTradicional(tabuleiro, 0, listaMovimento, pos0)){
+            */
+            if(buscaTradicional(tabuleiro, 0, listaMovimento, pos0, null)){
                 listaMovimento.forEach((t) -> {System.out.println(t);});
                 System.out.println("Tempo de processamento");
             }
