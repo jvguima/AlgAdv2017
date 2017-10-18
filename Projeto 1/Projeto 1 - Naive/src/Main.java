@@ -5,6 +5,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Main {
@@ -107,7 +108,7 @@ public class Main {
         
         pos0.setPos(newLine, newCol);//Atualiza a posição do zero       
     }
-   
+  
     /**
      * Busca tradicional, backtracking cego, bruteforce.
      * @param tabuleiro
@@ -176,6 +177,106 @@ public class Main {
             return false;
         }
     }    
+    
+    
+    /***
+     * Classe de Nó usada na modelagem de Árvore do A*.
+     */
+    static class No{
+        public No pai;
+        public int tabuleiro[][];
+        public Pos pos0;
+        public Movimentos movFeito;//Movimento feito para deixar 
+        public int numMovAnt;//Número de movimentos anteriores
+        public int numMovFut;//Número previsto de movimentos futuros.
+        
+        /**
+         * Construtor para o Nó raiz da árvore
+         * @param tab Estado inicial do tabuleiro
+         * @param pos0 Posição do zero
+         */
+        public No (int[][] tab, Pos pos0){
+            this.pai=null;
+            this.movFeito=null;
+            this.numMovAnt=0;
+            this.tabuleiro= tab;
+            this.pos0 = pos0;
+            
+            this.numMovFut = calcMovFuturos(this.tabuleiro);
+        }
+        
+        public No (No pai, Movimentos mov){
+            if(pai != null && mov != null){
+                int tabFilho[][] = new int[4][4];;
+                for(int j=0; j<4; j++){
+                    tabFilho[j] = pai.tabuleiro[j].clone();
+                }
+                Pos pos0Filho = new Pos(pai.pos0.lin, pai.pos0.col);
+                mover(tabFilho, pos0Filho, mov);
+
+                this.tabuleiro = tabFilho;
+                this.pos0 = pos0Filho;
+                this.movFeito = mov;
+                this.numMovAnt = pai.numMovAnt+1;
+
+                this.numMovFut = calcMovFuturos(this.tabuleiro);
+            }
+            
+        }
+        
+    }
+    
+    /*
+    IMPLEMENTAR UM COMPARADOR PARA A P-QUEUE====================================
+    A maior prioridade deve ser dada à menor soma de movimentos passados e estimativa de movimentos futuros
+    */
+    
+    /**
+     * Método para a heurística. 
+     * Calcula a estimativa de movimentos a serem realizados baseado 
+     * no número de elementos fora de ordem.
+     * @param tab
+     * @return 
+     */
+    public static int calcMovFuturos(int [][] tabuleiro){
+        int movEstimados = 0;
+        for(int i=0;i<15;i++)
+            if(tabuleiro[i/4][i%4] != i+1)
+		movEstimados++;
+        
+        return movEstimados;
+    }
+    
+    
+    public static boolean buscaAstar(No noInicial){
+        
+        //Fila de prioridade usada no A*
+        PriorityQueue<No> pq = new PriorityQueue<>();
+        pq.add(noInicial);
+        
+        while(!pq.isEmpty()){
+            No noAtual = pq.poll();
+            
+            //RESPOSTA
+            if(noAtual.numMovFut==0){
+                //Printa caminho
+                return true;
+            }
+            
+            //Gera lista de movimentos válidos baseado na posição do zero.
+            ArrayList<Movimentos> movimentosValidos;
+            movimentosValidos = geraMovimentosValidos(noAtual.tabuleiro, noAtual.pai.movFeito, noAtual.pos0);      
+            
+            //Para cada filho do nó atual
+            for (Movimentos i : movimentosValidos){
+                //Cria o novo tabuleiro
+                No noFilho = new No(noAtual, i);
+                pq.add(noFilho);
+            }
+        }
+        return false;
+    }
+    
    
     public static void main(String[] args) {
 	Scanner s = new Scanner(System.in);
@@ -225,8 +326,9 @@ public class Main {
             long totalTime = endTime - startTime;
             if(success){
                 for(int k=listaMovimento.size()-1; k>=0; k--){
-                    System.out.println(listaMovimento.get(k));
+                    System.out.print(listaMovimento.get(k) + " ");
                 }
+                System.out.println("\n");
             }
             else
                 System.out.println( "‘This puzzle is not solvable.’");
