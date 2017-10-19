@@ -1,12 +1,12 @@
 /**
  *
  * @authors João Victor Lopes da Silva Guimarães - 8936843
- *		   	Danilo Marques Araujo dos Santos	 - 8598670
+ *          Danilo Marques Araujo dos Santos	 - 8598670
  */
  
 import java.util.ArrayList;
  
-class BuscaTradicional {
+class BuscaBruteForce {
 	/**
      * Busca tradicional, backtracking cego, bruteforce.
      * @param tabuleiro
@@ -16,11 +16,9 @@ class BuscaTradicional {
      * @param UltMov Ultimo movimento realizado. Null se é o primeiro movimento
      * @return 
      */
-    static boolean buscaTradicional(int tabuleiro[][], int nRecursao,
+    static boolean buscaBruteForce(int tabuleiro[][], int nRecursao,
 	ArrayList<Auxiliar.Movimentos> ListaMovimento, Pos pos0, Auxiliar.Movimentos ultMov) {
-        
-        //System.out.println("Rec:" + nRecursao);
-        
+                
         /* So you will not be allowed to use more than 50 steps to solve a puzzle. If the given initial
         configuration is not solvable you just need to print the line ‘This puzzle is not solvable.’*/
         if(nRecursao >= 50)
@@ -50,7 +48,7 @@ class BuscaTradicional {
 				}*/
 				
 				
-				if(buscaTradicional(tabuleiro, nRecursao+1, ListaMovimento, pos0, i)){
+				if(buscaBruteForce(tabuleiro, nRecursao+1, ListaMovimento, pos0, i)){
 					ListaMovimento.add(i);
 					return true;
 				}

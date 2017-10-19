@@ -1,5 +1,10 @@
+/**
+ *
+ * @authors João Victor Lopes da Silva Guimarães - 8936843
+ *          Danilo Marques Araujo dos Santos	 - 8598670
+ */
 
-public class No {
+public class No implements Comparable<No> {
     /***
     * Classe de Nó usada na modelagem de Árvore do A*.
     */
@@ -27,6 +32,18 @@ public class No {
         return movEstimados;
     }
     
+    @Override
+    public int compareTo(No o) {
+        
+        //Menor soma de anterior com futuro = MAIOR PRIORIDADE
+        if(this.numMovAnt + this.numMovFut < o.numMovAnt + o.numMovAnt)
+            return -1;
+        else if (this.numMovAnt + this.numMovFut == o.numMovAnt + o.numMovAnt)
+            return 0;
+        else
+            return 1;
+    }   
+    
     /**
      * Construtor para o Nó raiz da árvore
      * @param tab Estado inicial do tabuleiro
@@ -42,6 +59,11 @@ public class No {
         this.numMovFut = calcMovFuturos(this.tabuleiro);
     }
 
+    /**
+     * Construtor para nós não-raiz da árvore.
+     * @param pai Nó pai
+     * @param mov Movimento a ser feito para reconfigurar o tabuleiro
+     */
     public No (No pai, Auxiliar.Movimentos mov){
         if(pai != null && mov != null){
             int tabFilho[][] = new int[4][4];;
@@ -55,10 +77,19 @@ public class No {
             this.pos0 = pos0Filho;
             this.movFeito = mov;
             this.numMovAnt = pai.numMovAnt+1;
-
+            this.pai = pai;
             this.numMovFut = calcMovFuturos(this.tabuleiro);
         }
-
     }
-        
+
+    public No(int numMovAnt, int numMovFut) {
+        this.pai=null;
+        this.tabuleiro = null;
+        this.pos0 = null;
+        this.movFeito = null;
+        this.numMovAnt = numMovAnt;
+        this.numMovFut = numMovFut;
+    }
+    
+    
 }
