@@ -32,11 +32,12 @@ public class Main {
             // length: tamanho da barra
             //  nCuts: número de cortes
             int length = s.nextInt();
-            int nCuts = s.nextInt();
-
             //Condição de parada do problema
             if(length==0)
-                break;
+                break;            
+            int nCuts = s.nextInt();
+
+
             
             /**
              * O vetor de armazenamento das posições dos cortes, incluindo 
