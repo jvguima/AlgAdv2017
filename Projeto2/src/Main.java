@@ -6,74 +6,90 @@
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
+public class Main {	
 
 
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         
         while(true){
-            
+
             int length = s.nextInt();
-            //Condição de parada
+            
+            //Condição de parada do problema
             if(length==0)
                 break;
+            
             int nCuts = s.nextInt();
             
-            int [] cutPos = new int [nCuts+1];
-            cutPos[0] = 0;  
             
-            for(int i=1; i<nCuts+1; i++){
-                cutPos[i]=s.nextInt();
-            }
+            //Inclui um corte para o começo e um corte para o final
+            int[] cutPos = new int [nCuts+2];
+
             /***
              * Tabela de memoização a ser utilizada no programa
              * 
              * Ela armazena em [i][j] o custo mínimo para realizar um corte
              * entre as posições dos cortes i e j
              * 
-             */
-            int [][] minCost = new int [nCuts+1][nCuts+1];
+             */        
+
+            int[] [] minCost = new int [51][51];
+
+
+            for (int beg = 1; beg <= nCuts; beg++)
+                cutPos[beg]=s.nextInt();
+
+            cutPos[0] = 0;
             
-            for(int j=1; j<= nCuts; j++){ //POS FINAL
-                for(int i=j-1; i >= 0; i--){  //POS INICIAL
+            /**Deixa o tamanho de nCuts = ao tamanho do vetor cutPos
+             * Isso facilita a iteração por eles
+            */
+            nCuts++;
+            cutPos[nCuts] = length;
+
+            for (int end = 1; end <= nCuts; end++){
+                for (int beg = end - 1; beg >= 0; beg--) {
                     
                     /**
                      * Casos base: Se não há cortes entre i e j, 
                      * o custo também é Zero.
-                     */
-                    if(i+1 == j)
-                        minCost[i][j] = 0;
-                 
-                    else{
+                     */                    
+                    if (beg + 1 == end)
+                        minCost[beg][end] = 0;
+
+                    else {
                         //Tamanho máximo calculável
-                        minCost[i][j] = Integer.MAX_VALUE;
+                        minCost[beg][end] = Integer.MAX_VALUE;
+                        
                         /**
-                         * Verifica linearmente todos os cortes possíveis entre j e i.
-                         * Seleciona o melhor possível
-                         */
-                        for (int k = i+1; k < j; k++){
-                           //ans = Math.min(ans, minCost[i][k] + minCost[k][j] );
-                           if(minCost[i][k] + minCost[k][j] < minCost[i][j])
-                               minCost[i][j] = minCost[i][k] + minCost[k][j];
+                         * Verifica linearmente todos os cortes possíveis entre 
+                         * fim e começo. Seleciona o melhor possível
+                         */                        
+                        for (int k = beg + 1; k < end; k++) {
+                            if (minCost[beg][k] + minCost[k][end] < minCost[beg][end])
+                                minCost[beg][end] = minCost[beg][k] + minCost[k][end];
                         }
                         //Custo do tamanho da barra atual mais o custo mínimo entre elas
-                        minCost[i][j] += cutPos[j] - cutPos[i];
+                        minCost[beg][end] += cutPos[end] - cutPos[beg];
+
+                    }
+
+                }
+            }
+                /**
+                 * Imprime a Matriz Memoização
+                 */
+                for(int beg=0; beg<nCuts+1; beg++){
+                    System.out.println("");
+                    for(int end=0; end<nCuts+1; end++){
+                        System.out.print(" " + minCost[beg][end]);
                     }
                 }
-            }
-            
-            /**
-             * Imprime a Matriz Resposta
-             */
-            for(int i=0; i<nCuts+1; i++){
-                System.out.println("");
-                for(int j=0; j<nCuts+1; j++){
-                    System.out.print(" " + minCost[i][j]);
-                }
-            }
-            
-            System.out.println("\n\n"+minCost[0][nCuts]);
+                
+                //Resposta final
+                System.out.println("\n"+ minCost[0][nCuts]);
+
         }
         
     }
